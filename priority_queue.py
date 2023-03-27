@@ -3,6 +3,7 @@ import random
 class MessageObject():
     def __init__(self, priority_range: (int, int) ) -> None:
         self.priority=random.randint(priority_range[0], priority_range[1])
+        self.initial=self.priority
         self.active=True
 
     def get_priority(self)-> int:
@@ -13,6 +14,10 @@ class MessageObject():
 
     def is_active(self) -> bool:
         return self.active
+
+    def decrease_key(self,dec: int) -> None:
+        if self.priority-dec>0:
+            self.priority -= dec
 
 
 class PriorityQueue():
@@ -55,6 +60,45 @@ class AgeQueue():
     def addmessage(self,msg: MessageObject ) -> None:
         self.queue.append(msg)
 
+    def decrease_key(self,numkeys: int , dec: int) -> None:
+        if numkeys<len(self.queue):
+            i=0
+            while i<numkeys:
+                msg=self.queue.pop(0)
+                if msg.is_active():
+                    msg.decrease_key(dec)
+                    self.queue.append(msg)
+                    i+=1
+        elif len(self.queue)==0:
+            return
+        else:
+            l=len(self.queue)
+            for i in range(l):
+                msg = self.queue.pop(0)
+                if msg.is_active():
+                    msg.decrease_key(dec)
+                    self.queue.append(msg)
+
+    def decrease_key_dryrun(self,numkeys: int , dec: int) -> list[MessageObject]:
+        listout=[]
+        if numkeys<len(self.queue):
+            i=0
+            index=i
+            while i<numkeys:
+                msg=self.queue[index]
+                listout.append(msg)
+                if msg.is_active():
+                    i+=1
+                    index+=1
+                else:
+                    index+=1
+        elif len(self.queue)==0:
+            return []
+        else:
+            return [self.queue]
+        return listout
+
+
 
 
 
@@ -74,6 +118,7 @@ class PriorityQueueProblem():
         self.priority_range = priority_range
         self.next_incoming = None
         self.next_outgoing = None
+        self.next_decrease=[]
         self.priority_queue = PriorityQueue()
         self.age_queue = AgeQueue()
         self.input_interval=int(self.rate_period/self.base_in_rate)
@@ -93,6 +138,10 @@ class PriorityQueueProblem():
             msg=self.priority_queue.sendmessage()
             msg.mark_inactive()
             self.next_outgoing = None
+        # perform decrease
+        if len(self.next_decrease)>0:
+            self.age_queue.decrease_key(self.decrease_key_qty,1)
+            self.next_decrease=[]
 
         # generate next message in and out one step ahead.
         if (self.timestep+1)%self.input_interval == 0:
@@ -100,6 +149,9 @@ class PriorityQueueProblem():
         # next message out
         if (self.timestep+1)%self.output_interval == 0:
             self.next_outgoing=self.priority_queue.topmessage()
+        #next decrease step
+        if (self.timestep+1)%self.decrease_key_interval == 0:
+            self.next_decrease=self.age_queue.decrease_key_dryrun(self.decrease_key_qty,1)
 
         self.timestep += 1
 
@@ -111,7 +163,7 @@ class PriorityQueueProblem():
 
 
 if __name__=="__main__":
-    x=PriorityQueueProblem(25, 50, 75, 20, 30, (1, 100), (5,30))
+    x=PriorityQueueProblem(50, 5, 75, 20, 30, (1, 100), (5,30))
 
     for i in range(200):
         x.do_next_step()
