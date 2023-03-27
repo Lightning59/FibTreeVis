@@ -5,6 +5,7 @@ from kivy.uix.widget import Widget
 
 
 
+
 class BasicQueue(BoxLayout):
     pass
 
@@ -16,7 +17,6 @@ class MainLayout(Widget):
 
     def __init__(self, **kwargs):
         super(MainLayout, self).__init__(**kwargs)
-
         layout=self.ids.priority_queue
         for i in range(50):
             layout.add_widget(QueueBox())
