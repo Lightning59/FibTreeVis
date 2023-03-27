@@ -111,7 +111,7 @@ class PriorityQueueProblem():
 
 
 if __name__=="__main__":
-    x=PriorityQueueProblem(50, 5, 75, 20, 30, (1, 100), (5,30))
+    x=PriorityQueueProblem(25, 50, 75, 20, 30, (1, 100), (5,30))
 
     for i in range(200):
         x.do_next_step()
