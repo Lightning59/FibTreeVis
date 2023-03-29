@@ -10,23 +10,22 @@
         padding:5,5,5,5
         spacing:3
         orientation: "vertical"
+        pos_hint:{"center_y":.5}
         BoxLayout:
             Label:
                 color: 0,0,0,1
                 text: "Stats"
         BoxLayout:
+            pos_hint:{"center_y":.5}
             spacing: 5
-            size_hint_max_y: 100
             padding:0,10,0,10
             QueueBox:
-                size_hint:.1,1
-                size_hint_min_x: 50
             BasicQueue:
+                pos_hint:{"center_y":.5}
                 id: priority_queue
+                Button:
                 # programmatic queboxes get added here
             QueueBox:
-                size_hint:.1,1
-                size_hint_min_x:50
         BoxLayout:
             size_hint_max_y:100
             BasicQueue:
@@ -46,22 +45,27 @@
 
 <BasicQueue>:
     spacing: 5
-    size_hint_max_y: 100
     padding:20,0,20,0
 
+
 <QueueBox>:
-    canvas:
-        Color:
-            rgb: 1,.6,0
-        Rectangle:
-            size: self.width, self.height
-            pos: self.center_x-self.width/2,self.center_y-self.height/2
-        Color:
-            rgb:0,0,0
-    Label:
-        pos: root.center_x,root.center_y
-        color: 0,0,0,1
-        text: "##"
+    size_hint_min_x:25
+    size_hint_max_x:100
+    size_hint: 1, None
+    size: self.width,self.width
+    pos_hint:{"center_y":.5}
+    AnchorLayout:
+        canvas:
+            Color:
+                rgb: 1,.6,0
+            Rectangle:
+                size: self.width, self.height
+                pos: self.center_x-self.width/2,self.center_y - self.width/2
+            Color:
+                rgb:0,0,0
+        Label:
+            color: 0,0,0,1
+            text: root.labeltext
 
 
 
