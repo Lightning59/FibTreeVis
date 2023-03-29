@@ -10,10 +10,8 @@ class BasicQueue(BoxLayout):
     pass
 
 class QueueBox(BoxLayout):
-    labeltext=StringProperty('test')
-
-    def update_label(self,newlable:str)-> None:
-        self.labeltext=newlable
+    initial_label=StringProperty('init')
+    curr_label = StringProperty('curr')
 
 
 class MainLayout(Widget):
@@ -24,7 +22,8 @@ class MainLayout(Widget):
         layout=self.ids.priority_queue
         for i in range(10):
             this_wid=QueueBox()
-            this_wid.update_label(str(i))
+            this_wid.initial_label=str(i)
+            this_wid.curr_label=str(i-1)
             layout.add_widget(this_wid)
 
 
