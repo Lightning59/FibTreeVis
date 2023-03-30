@@ -19,15 +19,16 @@
                 color: 0,0,0,1
                 text: "Stats"
         BoxLayout:
+            id: main_row
             pos_hint:{"center_y":.5}
             spacing: 5
             padding:0,10,0,10
-            QueueBox:
-            BasicQueue:
-                pos_hint:{"center_y":.5}
-                id: priority_queue
-                # programmatic queboxes get added here
-            QueueBox:
+#            QueueBox:
+#            BasicQueue:
+#                pos_hint:{"center_y":.5}
+#                id: priority_queue
+#                # programmatic queboxes get added here
+#            QueueBox:
         BoxLayout:
             size_hint_max_y:100
             BasicQueue:
@@ -41,8 +42,10 @@
             size_hint: 1, 1
             Button:
                 text:'back'
+                on_press: root.backward_press()
             Button:
                 text:"Forward"
+                on_press: root.forward_press()
 
 
 
@@ -75,5 +78,18 @@
             color: 0,0,0,1
             text: root.curr_label
 
-
+<PHQueueBox@BoxLayout>:
+    size_hint_min_x:25
+    size_hint_max_x:100
+    size_hint: 1, 1
+    size: self.width,self.width
+    pos_hint:{"center_y":.5}
+    BoxLayout:
+        orientation: "vertical"
+        canvas:
+            Color:
+                rgb: 1,1,1
+            Rectangle:
+                size: self.width, self.height
+                pos: self.center_x-self.width/2,self.center_y - self.width/2
 

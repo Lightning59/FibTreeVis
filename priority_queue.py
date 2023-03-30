@@ -1,4 +1,6 @@
 import random
+from typing import Optional
+
 
 class MessageObject():
     def __init__(self, priority_range: (int, int) ) -> None:
@@ -126,6 +128,21 @@ class PriorityQueueProblem():
         self.decrease_key_qty, self.decrease_key_period = decrease_key
         self.decrease_key_interval= int(self.rate_period / self.decrease_key_period)
 
+    def gen_next_message(self)->Optional[MessageObject]:
+        rate=self.base_in_rate
+        if self.surge_in_start<self.timestep<self.surge_in_end:
+            rate= self.surge_in_rate
+        r=random.randint(1,100)
+        if r<=rate:
+            priority=random.randint(self.priority_range[0],self.priority_range[1])
+            msg=MessageObject(self.priority_range)
+            return msg
+        return None
+
+
+
+
+
 
     def do_next_step(self) -> None:
         # add incoming messages to queue and reset incoming queue
@@ -144,8 +161,7 @@ class PriorityQueueProblem():
             self.next_decrease=[]
 
         # generate next message in and out one step ahead.
-        if (self.timestep+1)%self.input_interval == 0:
-            self.next_incoming=MessageObject(self.priority_range)
+        self.next_incoming=self.gen_next_message()
         # next message out
         if (self.timestep+1)%self.output_interval == 0:
             self.next_outgoing=self.priority_queue.topmessage()
