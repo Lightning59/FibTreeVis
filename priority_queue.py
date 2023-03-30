@@ -8,28 +8,28 @@ from kivy.uix.boxlayout import BoxLayout
 class QueueBox(BoxLayout):
     initial_label = StringProperty('init')
     curr_label = StringProperty('curr')
-    maxhint = NumericProperty(100)
+    max_hint = NumericProperty(100)
 
-    def __init__(self, val, **kwargs):
+    def __init__(self, val: int, **kwargs) -> None:
         super(QueueBox, self).__init__(**kwargs)
         self.initial_label = str(val)
         self.curr_label = str(val)
 
-    def update_curr(self, val):
+    def update_curr(self, val: int) -> None:
         self.curr_label = str(val)
 
-    def on_size(self, *args):
+    def on_size(self, *args) -> None:
         try:
-            currhint = min(100, self.parent.height)
+            current_hint = min(100, self.parent.height)
             if self.parent.height < 100:
-                currhint = max(25, self.parent.height)
-            self.maxhint = currhint
+                current_hint = max(25, self.parent.height)
+            self.max_hint = current_hint
         except AttributeError:
-            self.maxhint = 100
+            self.max_hint = 100
 
 
 class MessageObject:
-    def __init__(self, priority_range: (int, int)) -> None:
+    def __init__(self, priority_range: tuple[int, int]) -> None:
         self.priority = random.randint(priority_range[0], priority_range[1])
         self.initial = self.priority
         self.active = True
@@ -38,7 +38,7 @@ class MessageObject:
     def get_priority(self) -> int:
         return self.priority
 
-    def mark_inactive(self):
+    def mark_inactive(self) -> None:
         self.active = False
 
     def is_active(self) -> bool:
@@ -58,7 +58,7 @@ class PriorityQueue:
     def __init__(self) -> None:
         self.queue = []
 
-    def addmessage(self, msg: MessageObject) -> None:
+    def add_message(self, msg: MessageObject) -> None:
         if len(self.queue) == 0:
             self.queue.append(msg)
         else:
@@ -68,13 +68,13 @@ class PriorityQueue:
                     return
             self.queue.append(msg)
 
-    def topmessage(self) -> Optional[MessageObject]:
+    def top_message(self) -> Optional[MessageObject]:
         if len(self.queue) > 0:
             return self.queue[0]
         else:
             return None
 
-    def sendmessage(self) -> Optional[MessageObject]:
+    def send_message(self) -> Optional[MessageObject]:
         if len(self.queue) > 0:
             return self.queue.pop(0)
         else:
@@ -86,13 +86,13 @@ class AgeQueue:
     def __init__(self) -> None:
         self.queue = []
 
-    def addmessage(self, msg: MessageObject) -> None:
+    def add_message(self, msg: MessageObject) -> None:
         self.queue.append(msg)
 
-    def decrease_key(self, numkeys: int, dec: int) -> None:
-        if numkeys < len(self.queue):
+    def decrease_key(self, num_keys: int, dec: int) -> None:
+        if num_keys < len(self.queue):
             i = 0
-            while i < numkeys:
+            while i < num_keys:
                 msg = self.queue.pop(0)
                 if msg.is_active():
                     msg.decrease_key(dec)
@@ -108,14 +108,14 @@ class AgeQueue:
                     msg.decrease_key(dec)
                     self.queue.append(msg)
 
-    def decrease_key_dryrun(self, numkeys: int) -> list[MessageObject]:
-        listout = []
-        if numkeys < len(self.queue):
+    def decrease_key_dryrun(self, num_keys: int) -> list[MessageObject]:
+        list_out = []
+        if num_keys < len(self.queue):
             i = 0
             index = i
-            while i < numkeys:
+            while i < num_keys:
                 msg = self.queue[index]
-                listout.append(msg)
+                list_out.append(msg)
                 if msg.is_active():
                     i += 1
                     index += 1
@@ -125,7 +125,7 @@ class AgeQueue:
             return []
         else:
             return self.queue
-        return listout
+        return list_out
 
 
 class PriorityQueueProblem:
@@ -134,7 +134,6 @@ class PriorityQueueProblem:
                  surge_in_end: int, priority_range: tuple[int, int], decrease_key: tuple[int, int]) -> None:
         """
         Class constructor for a priority queue simulation
-
         :param base_in_rate: number of packages in per base rate that come in on avg (currently base rate is 100 steps)
         :param base_out_rate: number of packages sent per base rate that come in on avg (currently base rate is 100
         steps)
@@ -177,12 +176,12 @@ class PriorityQueueProblem:
     def do_next_step(self) -> None:
         # add incoming messages to queue and reset incoming queue
         if self.next_incoming is not None:
-            self.priority_queue.addmessage(self.next_incoming)
-            self.age_queue.addmessage(self.next_incoming)
+            self.priority_queue.add_message(self.next_incoming)
+            self.age_queue.add_message(self.next_incoming)
             self.next_incoming = None
         # send outgoing messages reset outgoing mark message in time queue as inactive
         if self.next_outgoing is not None:
-            msg = self.priority_queue.sendmessage()
+            msg = self.priority_queue.send_message()
             msg.mark_inactive()
             self.next_outgoing = None
         # perform decrease
@@ -194,7 +193,7 @@ class PriorityQueueProblem:
         self.next_incoming = self.gen_next_message()
         # next message out
         if (self.timestep + 1) % self.output_interval == 0:
-            self.next_outgoing = self.priority_queue.topmessage()
+            self.next_outgoing = self.priority_queue.top_message()
         # next decrease step
         if (self.timestep + 1) % self.decrease_key_interval == 0:
             self.next_decrease = self.age_queue.decrease_key_dryrun(self.decrease_key_qty)

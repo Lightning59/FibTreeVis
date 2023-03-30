@@ -19,7 +19,7 @@ class MainLayout(Widget):
     std_min = 25
     curr_height = NumericProperty(100)
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         super(MainLayout, self).__init__(**kwargs)
 
         self.simulation = priority_queue.PriorityQueueProblem(20, 25, 75, 20, 40, (1, 100), (5, 30))
@@ -33,17 +33,17 @@ class MainLayout(Widget):
     #    def on_size (self, *args):
     #        pass
 
-    def forward_press(self, *args):
+    def forward_press(self, *args) -> None:
         self.simulation.do_next_step()
         if self.simulation.next_incoming is not None:
             self.pqueue.add_widget(self.simulation.next_incoming.return_vis())
 
-    def backward_press(self, *args):
+    def backward_press(self, *args) -> None:
         self.main_row.add_widget(self.pqueue)
 
 
 class FibTreeVisApp(App):
-    def build(self):
+    def build(self) -> MainLayout:
         return MainLayout()
 
 
