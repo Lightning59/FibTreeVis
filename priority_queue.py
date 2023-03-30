@@ -1,12 +1,38 @@
 import random
 from typing import Optional
 
+from kivy.properties import StringProperty, NumericProperty
+from kivy.uix.boxlayout import BoxLayout
+
+
+class QueueBox(BoxLayout):
+    initial_label=StringProperty('init')
+    curr_label = StringProperty('curr')
+    maxhint = NumericProperty(100)
+
+    def __init__(self, val, **kwargs):
+        super(QueueBox,self).__init__(**kwargs)
+        self.initial_label=str(val)
+        self.curr_label=str(val)
+
+    def update_curr(self,val):
+        self.curr_label=str(val)
+
+    def on_size(self, *args):
+        try:
+            currhint = min(100, self.parent.height)
+            if self.parent.height < 100:
+                currhint = max(25, self.parent.height)
+            self.maxhint = currhint
+        except AttributeError:
+            self.maxhint=100
 
 class MessageObject():
     def __init__(self, priority_range: (int, int) ) -> None:
         self.priority=random.randint(priority_range[0], priority_range[1])
         self.initial=self.priority
         self.active=True
+        self.vis = QueueBox(self.priority)
 
     def get_priority(self)-> int:
         return self.priority
@@ -20,6 +46,11 @@ class MessageObject():
     def decrease_key(self,dec: int) -> None:
         if self.priority-dec>0:
             self.priority -= dec
+            self.vis.update_curr(self.priority)
+
+    def return_vis(self) -> QueueBox:
+        return self.vis
+
 
 
 class PriorityQueue():
@@ -108,7 +139,20 @@ class AgeQueue():
 class PriorityQueueProblem():
 
     def __init__(self, base_in_rate: int, base_out_rate: int, surge_in_rate: int, surge_in_start: int,
-                 surge_in_end: int, priority_range: (int, int), decrease_key:(int, int)) -> None:
+                 surge_in_end: int, priority_range: tuple[int,int], decrease_key:tuple[int,int]) -> None:
+        """
+        Class constructor for a priority queue simulation
+
+        :param base_in_rate: number of packages in per base rate that come in on avg (currently base rate is 100 steps)
+        :param base_out_rate: number of packages sent per base rate that come in on avg (currently base rate is 100
+        steps)
+        :param surge_in_rate: number of packages in per base rate during an elevated surge period that come in on avg
+        (currently base rate is 100 steps)
+        :param surge_in_start: how many steps in till surge begins
+        :param surge_in_end: how many steps from beginning till surge ends
+        :param priority_range: tuple of two ints lowest and highest possible priority (uniform randomly assigned)
+        :param decrease_key: (number of messages to reduce at time, Rate in times per 100 which this will occur)
+        """
 
         self.base_in_rate=base_in_rate
         self.base_out_rate=base_out_rate
