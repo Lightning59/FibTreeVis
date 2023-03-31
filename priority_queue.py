@@ -8,9 +8,11 @@ from kivy.uix.boxlayout import BoxLayout
 class QueueBox(BoxLayout):
     initial_label = StringProperty('init')
     curr_label = StringProperty('curr')
+    time_label = StringProperty('Age: 0')
     max_hint = NumericProperty(100)
     active=BooleanProperty(True)
     active_color = ColorProperty([1,.6,0,1])
+
 
     def __init__(self, val: int, **kwargs) -> None:
         super(QueueBox, self).__init__(**kwargs)
@@ -19,6 +21,9 @@ class QueueBox(BoxLayout):
 
     def update_curr(self, val: int) -> None:
         self.curr_label = str(val)
+
+    def update_time(self, val: int) -> None:
+        self.time_label = "Age: "+str(val)
 
     def mark_inactive(self):
         self.active=False
@@ -36,6 +41,7 @@ class QueueBox(BoxLayout):
 
 class MessageObject:
     def __init__(self, priority_range: tuple[int, int]) -> None:
+        self.time_label=0
         self.priority = random.randint(priority_range[0], priority_range[1])
         self.initial = self.priority
         self.still_active = True
@@ -45,6 +51,11 @@ class MessageObject:
         self.vis_aq= QueueBox(self.priority)
         self.vis_dk = QueueBox(self.priority)
         self.vis_list=[self.vis_incoming,self.vis_pq,self.vis_outgoing,self.vis_aq,self.vis_dk]
+
+    def increment_time(self):
+        self.time_label+=1
+        for vis in self.vis_list:
+            vis.update_time(self.time_label)
 
     def get_priority(self) -> int:
         return self.priority
@@ -228,6 +239,8 @@ class PriorityQueueProblem:
             self.next_decrease = self.age_queue.decrease_key_dryrun(self.decrease_key_qty)
 
         self.timestep += 1
+        for message in self.priority_queue.queue:
+            message.increment_time()
 
 
 if __name__ == "__main__":

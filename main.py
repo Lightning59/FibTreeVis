@@ -1,5 +1,5 @@
 from kivy.app import App
-from kivy.properties import ObjectProperty, NumericProperty
+from kivy.properties import ObjectProperty, NumericProperty, StringProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.widget import Widget
 import priority_queue
@@ -20,11 +20,12 @@ class MainLayout(Widget):
     std_height = 100
     std_min = 25
     curr_height = NumericProperty(100)
+    curr_step=StringProperty("0")
 
     def __init__(self, **kwargs) -> None:
         super(MainLayout, self).__init__(**kwargs)
 
-        self.simulation = priority_queue.PriorityQueueProblem(20, 25, 50, 20, 60, (1, 100), (5, 30))
+        self.simulation = priority_queue.PriorityQueueProblem(20, 25, 50, 20, 100, (1, 100), (5, 15))
         self.main_row = self.ids.main_row
         self.age_row = self.ids.age_row
         self.main_row.add_widget(PHQueueBox())
@@ -91,6 +92,7 @@ class MainLayout(Widget):
         self.simulation.do_next_step()
         self.update_main_row()
         self.update_age_row()
+        self.curr_step=str(self.simulation.timestep)
 
     def backward_press(self, *args) -> None:
         self.main_row.add_widget(self.pqueue)
