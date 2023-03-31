@@ -104,6 +104,8 @@ class PriorityQueue:
         else:
             return None
 
+    def decrease_key_update(self):
+        self.queue.sort(key=lambda obj: obj.get_priority())
 
 class AgeQueue:
 
@@ -212,6 +214,7 @@ class PriorityQueueProblem:
         if len(self.next_decrease) > 0:
             self.age_queue.decrease_key(self.decrease_key_qty, 1)
             self.next_decrease = []
+            self.priority_queue.decrease_key_update()
 
         # generate next message in and out one step ahead.
         self.next_incoming = self.gen_next_message()
