@@ -70,7 +70,7 @@ class MessageObject:
 
     def decrease_key(self, dec: int) -> None:
         if self.priority - dec > 0:
-            self.priority -= dec
+            self.priority -= (1+self.time_label//10)*dec
             for vis in self.vis_list:
                 vis.update_curr(self.priority)
 
