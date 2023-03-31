@@ -1,7 +1,7 @@
 import random
 from typing import Optional
 
-from kivy.properties import StringProperty, NumericProperty
+from kivy.properties import StringProperty, NumericProperty, BooleanProperty
 from kivy.uix.boxlayout import BoxLayout
 
 
@@ -9,6 +9,7 @@ class QueueBox(BoxLayout):
     initial_label = StringProperty('init')
     curr_label = StringProperty('curr')
     max_hint = NumericProperty(100)
+    active=BooleanProperty(True)
 
     def __init__(self, val: int, **kwargs) -> None:
         super(QueueBox, self).__init__(**kwargs)
@@ -17,6 +18,9 @@ class QueueBox(BoxLayout):
 
     def update_curr(self, val: int) -> None:
         self.curr_label = str(val)
+
+    def mark_inactive(self):
+        self.active=False
 
     def on_size(self, *args) -> None:
         try:
@@ -32,25 +36,45 @@ class MessageObject:
     def __init__(self, priority_range: tuple[int, int]) -> None:
         self.priority = random.randint(priority_range[0], priority_range[1])
         self.initial = self.priority
-        self.active = True
-        self.vis = QueueBox(self.priority)
+        self.still_active = True
+        self.vis_incoming = QueueBox(self.priority)
+        self.vis_pq = QueueBox(self.priority)
+        self.vis_outgoing = QueueBox(self.priority)
+        self.vis_aq= QueueBox(self.priority)
+        self.vis_dk = QueueBox(self.priority)
+        self.vis_list=[self.vis_incoming,self.vis_pq,self.vis_outgoing,self.vis_aq,self.vis_dk]
 
     def get_priority(self) -> int:
         return self.priority
 
     def mark_inactive(self) -> None:
-        self.active = False
+        self.still_active=False
+        for vis in self.vis_list:
+            vis.mark_inactive()
 
     def is_active(self) -> bool:
-        return self.active
+        return self.still_active
 
     def decrease_key(self, dec: int) -> None:
         if self.priority - dec > 0:
             self.priority -= dec
-            self.vis.update_curr(self.priority)
+            for vis in self.vis_list:
+                vis.update_curr(self.priority)
 
-    def return_vis(self) -> QueueBox:
-        return self.vis
+    def return_vis(self, application: int) -> Optional[QueueBox]:
+        if application == 0:
+            return self.vis_incoming
+        elif application ==1:
+            return self.vis_pq
+        elif application ==2:
+            return self.vis_outgoing
+        elif application ==3:
+            return self.vis_aq
+        elif application ==4:
+            return self.vis_dk
+        else:
+            return None
+
 
 
 class PriorityQueue:
