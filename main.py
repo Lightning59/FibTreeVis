@@ -32,8 +32,8 @@ class MainLayout(Widget):
         self.pqueue = BasicQueue()
         self.main_row.add_widget(self.pqueue)
         self.main_row.add_widget(PHQueueBox())
-        self.age_queue=BasicQueue()
-        self.next_decrease=BasicQueue()
+        self.age_queue=BasicQueue(size_hint=(0.7,None))
+        self.next_decrease=BasicQueue(size_hint=(0.3,None))
         self.age_row.add_widget(self.age_queue)
         self.age_row.add_widget(self.next_decrease)
 
