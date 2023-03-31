@@ -1,7 +1,7 @@
 import random
 from typing import Optional
 
-from kivy.properties import StringProperty, NumericProperty, BooleanProperty
+from kivy.properties import StringProperty, NumericProperty, BooleanProperty, ColorProperty
 from kivy.uix.boxlayout import BoxLayout
 
 
@@ -10,6 +10,7 @@ class QueueBox(BoxLayout):
     curr_label = StringProperty('curr')
     max_hint = NumericProperty(100)
     active=BooleanProperty(True)
+    active_color = ColorProperty([1,.6,0,1])
 
     def __init__(self, val: int, **kwargs) -> None:
         super(QueueBox, self).__init__(**kwargs)
@@ -21,6 +22,7 @@ class QueueBox(BoxLayout):
 
     def mark_inactive(self):
         self.active=False
+        self.active_color=[.4,.4,.4,1]
 
     def on_size(self, *args) -> None:
         try:

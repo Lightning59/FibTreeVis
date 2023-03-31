@@ -24,7 +24,7 @@ class MainLayout(Widget):
     def __init__(self, **kwargs) -> None:
         super(MainLayout, self).__init__(**kwargs)
 
-        self.simulation = priority_queue.PriorityQueueProblem(20, 25, 50, 20, 40, (1, 100), (5, 30))
+        self.simulation = priority_queue.PriorityQueueProblem(20, 25, 50, 20, 60, (1, 100), (5, 30))
         self.main_row = self.ids.main_row
         self.age_row = self.ids.age_row
         self.main_row.add_widget(PHQueueBox())
