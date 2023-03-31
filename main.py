@@ -15,6 +15,7 @@ class PHQueueBox(BoxLayout):
 
 class MainLayout(Widget):
     main_row: BoxLayout
+    age_row: BoxLayout
     priority_queue = ObjectProperty()
     std_height = 100
     std_min = 25
@@ -25,10 +26,15 @@ class MainLayout(Widget):
 
         self.simulation = priority_queue.PriorityQueueProblem(20, 25, 50, 20, 40, (1, 100), (5, 30))
         self.main_row = self.ids.main_row
+        self.age_row = self.ids.age_row
         self.main_row.add_widget(PHQueueBox())
         self.pqueue = BasicQueue()
         self.main_row.add_widget(self.pqueue)
         self.main_row.add_widget(PHQueueBox())
+        self.age_queue=BasicQueue()
+        self.next_decrease=BasicQueue()
+        self.age_row.add_widget(self.age_queue)
+        self.age_row.add_widget(self.next_decrease)
 
     #    def on_size (self, *args):
     #        pass
@@ -62,9 +68,29 @@ class MainLayout(Widget):
         else:
             self.main_row.add_widget(PHQueueBox())
 
+    def update_age_queue_display(self):
+        self.remove_all_children(self.age_queue)
+        msg: priority_queue.MessageObject
+        msglist = self.simulation.age_queue.queue[::-1]
+        for msg in msglist:
+            self.age_queue.add_widget(msg.return_vis(3))
+
+    def update_decrease_key_display(self):
+        self.remove_all_children(self.next_decrease)
+        msg: priority_queue.MessageObject
+        msglist = self.simulation.next_decrease[::-1]
+        for msg in msglist:
+            self.next_decrease.add_widget(msg.return_vis(4))
+
+    def update_age_row(self):
+        self.update_age_queue_display()
+        self.update_decrease_key_display()
+
+
     def forward_press(self, *args) -> None:
         self.simulation.do_next_step()
         self.update_main_row()
+        self.update_age_row()
 
     def backward_press(self, *args) -> None:
         self.main_row.add_widget(self.pqueue)
