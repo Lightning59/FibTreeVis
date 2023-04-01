@@ -11,12 +11,12 @@ import priority_queue
 class BasicQueue(BoxLayout):
     pass
 
-
 class PHQueueBox(BoxLayout):
     pass
 
 class NextUpBoxWidget(Widget):
     pass
+
 
 
 class MainLayout(Widget):
