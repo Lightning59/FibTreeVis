@@ -1,7 +1,10 @@
 from kivy.app import App
+from kivy.graphics import Color, Line
 from kivy.properties import ObjectProperty, NumericProperty, StringProperty
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.widget import Widget
+
 import priority_queue
 
 
@@ -10,6 +13,9 @@ class BasicQueue(BoxLayout):
 
 
 class PHQueueBox(BoxLayout):
+    pass
+
+class NextUpBoxWidget(Widget):
     pass
 
 
@@ -24,7 +30,9 @@ class MainLayout(Widget):
 
     def __init__(self, **kwargs) -> None:
         super(MainLayout, self).__init__(**kwargs)
-
+        self.float=FloatLayout()
+        self.add_widget(self.float)
+        self.Age_region_rectangle = None
         self.simulation = priority_queue.PriorityQueueProblem(20, 25, 50, 20, 100, (1, 100), (5, 15))
         self.main_row = self.ids.main_row
         self.age_row = self.ids.age_row
@@ -35,12 +43,14 @@ class MainLayout(Widget):
         self.age_queue=BasicQueue(size_hint=(0.7,None))
         self.next_decrease=BasicQueue(size_hint=(0.3,None))
         self.age_row.add_widget(self.age_queue)
-        self.age_row.add_widget(self.next_decrease)
+        #self.age_row.add_widget(self.next_decrease)
 
     #    def on_size (self, *args):
     #        pass
 
-    def remove_all_children(self,boxlayout:BoxLayout)->None:
+
+    @staticmethod
+    def remove_all_children(boxlayout: BoxLayout) -> None:
         children = boxlayout.children.copy()
         for child in children:
             boxlayout.remove_widget(child)
@@ -85,11 +95,40 @@ class MainLayout(Widget):
 
     def update_age_row(self):
         self.update_age_queue_display()
-        self.update_decrease_key_display()
+        #self.update_decrease_key_display()
+        try:
+            self.float.remove_widget(self.Age_region_rectangle)
+        except AttributeError:
+            pass
+        self.Age_region_rectangle = NextUpBoxWidget()
+        next_decrease = self.simulation.next_decrease
+        if len(next_decrease) != 0:
+            first: priority_queue.MessageObject
+            last: priority_queue.MessageObject
+            first, last = next_decrease[0], next_decrease[-1]
+            firstvis = first.return_vis(3)
+            lastvis = last.return_vis(3)
+            lastx = lastvis.pos[0]
+            lasty = lastvis.pos[1]
+
+            firstx=firstvis.pos[0]
+            firty=firstvis.pos[1]
+
+            right = firstx+firstvis.width
+
+            width=right-lastx
+            height=lastvis.height
+            print("last: " + lastvis.time_label)
+            with self.Age_region_rectangle.canvas:
+                Color(1, 0, 0)
+                Line(rectangle=(lastx,lasty, width, height), width=2)
+        self.float.add_widget(self.Age_region_rectangle)
+        self.float.do_layout()
 
 
     def forward_press(self, *args) -> None:
         self.simulation.do_next_step()
+        self.update_age_row()
         self.update_main_row()
         self.update_age_row()
         self.curr_step=str(self.simulation.timestep)
@@ -97,6 +136,8 @@ class MainLayout(Widget):
     def backward_press(self, *args) -> None:
         self.main_row.add_widget(self.pqueue)
 
+    def on_size(self, *args):
+        self.update_age_row()
 
 class FibTreeVisApp(App):
     def build(self) -> MainLayout:
